@@ -1,0 +1,38 @@
+---
+- name: Add front-end ssh host key to known hosts
+  known_hosts:
+    name: "{{ one_frontend }}"
+    path: /var/lib/one/.ssh/known_hosts
+    key: "{{ one_frontend }} {{ one_frontend_key }}"
+    state: present
+
+- name: Set known hosts file ownership
+  file:
+    path: /var/lib/one/.ssh/known_hosts
+    owner: oneadmin
+    group: oneadmin
+
+- name: Set public ssh key
+  template:
+    src: id_rsa.pub.j2
+    dest: /var/lib/one/.ssh/id_rsa.pub
+    owner: oneadmin
+    group: oneadmin
+    mode: '0644'
+
+- name: Set authorized keys
+  template:
+    src: id_rsa.pub.j2
+    dest: /var/lib/one/.ssh/authorized_keys
+    owner: oneadmin
+    group: oneadmin
+    mode: '0644'
+
+- name: Set private ssh key
+  template:
+    src: id_rsa.j2
+    dest: /var/lib/one/.ssh/id_rsa
+    owner: oneadmin
+    group: oneadmin
+    mode: '0600'
+  no_log: true

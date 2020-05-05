@@ -1,0 +1,17 @@
+---
+- name: Refresh apt cache
+  apt:
+    update_cache: yes
+  changed_when: false
+
+- name: Install OpenNebula node software
+  import_tasks: one-node.yml
+
+- name: Configure networking
+  import_tasks: networking.yml
+
+- name: Configure disks
+  import_tasks: disk.yml
+
+- name: Configure passwordless ssh
+  import_tasks: ssh.yml

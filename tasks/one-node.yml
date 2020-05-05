@@ -1,0 +1,25 @@
+---
+- name: Install LXD
+  apt:
+    name: lxd
+    state: present
+
+- name: Add OpenNebula apt signing key
+  apt_key:
+    url: https://downloads.opennebula.org/repo/repo.key
+    state: present
+
+- name: Add OpenNebula 5.10 apt repository
+  apt_repository:
+    repo: deb https://downloads.opennebula.org/repo/5.10/Ubuntu/{{ ansible_distribution_version }} stable opennebula
+    filename: opennebula
+    update_cache: yes
+    state: present
+
+- name: Install opennebula-node-lxd
+  apt:
+    name: opennebula-node-lxd
+    state: present
+  notify:
+    - restart lxd
+    - restart libvirt-bin

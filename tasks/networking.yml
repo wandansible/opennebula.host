@@ -1,0 +1,45 @@
+---
+- name: Get default libvirt network info
+  command: virsh net-info default
+  register: result
+  ignore_errors: true
+  changed_when: false
+
+- name: Stop default libvirt network
+  command: virsh net-destroy default
+  when: 'result.stdout is search("Active:\s+yes")'
+
+- name: Disable autostart for default libvirt network
+  command: virsh net-autostart --network default --disable
+  when: 'result.stdout is search("Autostart:\s+yes")'
+
+- name: Install openvswitch-switch
+  apt:
+    name: openvswitch-switch
+    state: present
+
+- name: Create bluecables bridge (ovsbr0)
+  openvswitch_bridge:
+    bridge: ovsbr0
+    state: present
+
+- name: Add bluecables port ({{ one_bluecables_port }}) to bluecables bridge (ovsbr0)
+  openvswitch_port:
+    bridge: ovsbr0
+    port: "{{ one_bluecables_port }}"
+    state: present
+
+- name: Create redcables bridge (ovsbr1)
+  openvswitch_bridge:
+    bridge: ovsbr1
+    state: present
+
+- name: Add redcables port ({{ one_redcables_port }}) to redcables bridge (ovsbr1)
+  openvswitch_port:
+    bridge: ovsbr1
+    port: "{{ one_redcables_port }}"
+    state: present
+
+- name: Configure private network
+  include_tasks: private-net.yml
+  when: one_create_private_net

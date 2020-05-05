@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ovsbr1:
+      dhcp4: true
+      routes:
+        - to: 0.0.0.0/0
+          via: 163.7.137.254
+          table: 101
+        - to: 163.7.137.0/24
+          scope: link
+          table: 101
+      optional: false
+    ovsbr2:
+      addresses:
+        - 192.168.0.254/24
+      routes:
+        - to: 192.168.0.0/24
+          scope: link
+          table: 101
+      routing-policy:
+        - from: 192.168.0.0/24
+          table: 101
+      optional: false
+  bridges:
+    virbr0:
+      interfaces:
+        - ovsbr1
+        - ovsbr2
+      optional: false

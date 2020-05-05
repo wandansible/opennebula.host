@@ -1,0 +1,38 @@
+---
+- name: Create private network bridge (ovsbr2)
+  openvswitch_bridge:
+    bridge: ovsbr2
+    state: present
+
+- name: Create one-net systemd service
+  template:
+    src: one-net.service.j2
+    dest: /etc/systemd/system/one-net.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: systemd daemon-reload
+
+- name: Add one-net script
+  template:
+    src: one-net.j2
+    dest: /usr/local/bin/one-net
+    owner: root
+    group: root
+    mode: '0755'
+  notify: restart one-net
+
+- name: Start and enable one-net
+  service:
+    name: one-net
+    state: started
+    enabled: yes
+
+- name: Configure netplan
+  template:
+    src: 20-one-net.yaml.j2
+    dest: /etc/netplan/20-one-net.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: netplan apply

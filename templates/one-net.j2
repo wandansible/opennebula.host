@@ -1,0 +1,16 @@
+#!/bin/sh
+# {{ ansible_managed }}
+
+# Route IPv4 but bridge IPv6
+ebtables -t broute -F
+ebtables -t broute -A BROUTING -p ipv4 -i ovsbr1 -j DROP
+ebtables -t broute -A BROUTING -p ipv4 -i ovsbr2 -j DROP
+ebtables -t broute -A BROUTING -p arp -i ovsbr1 -j DROP
+ebtables -t broute -A BROUTING -p arp -i ovsbr2 -j DROP
+
+# NAT table configuration
+iptables -t nat -F
+iptables -t nat -A POSTROUTING -o ovsbr1 -s 192.168.0.0/24 -j MASQUERADE
+
+# Make sure firewall rules are loaded for ovsbr1 and ovsbr2
+bearwall2

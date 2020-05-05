@@ -1,0 +1,17 @@
+---
+- name: Mount disks to OpenNebula datastores
+  mount:
+    path: /var/lib/one/datastores/{{ item.id }}
+    src: UUID={{ item.disk_uuid }}
+    fstype: ext4
+    state: mounted
+  with_items: "{{ one_datastores }}"
+
+- name: Set OpenNebula datastore ownership and permissions
+  file:
+    path: /var/lib/one/datastores/{{ item.id }}
+    state: directory
+    owner: oneadmin
+    group: oneadmin
+    mode: '0755'
+  with_items: "{{ one_datastores }}"

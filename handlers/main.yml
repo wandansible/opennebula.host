@@ -1,0 +1,22 @@
+---
+- name: restart lxd
+  service:
+    name: lxd
+    state: restarted
+
+- name: restart libvirt-bin
+  service:
+    name: libvirt-bin
+    state: restarted
+
+- name: systemd daemon-reload
+  systemd:
+    daemon_reload: yes
+
+- name: restart one-net
+  service:
+    name: one-net
+    state: restarted
+
+- name: netplan apply
+  command: netplan apply
