@@ -14,7 +14,7 @@
 
 - name: Set public ssh key
   template:
-    src: id_rsa.pub.j2
+    src: id_rsa.pub
     dest: /var/lib/one/.ssh/id_rsa.pub
     owner: oneadmin
     group: oneadmin
@@ -22,17 +22,41 @@
 
 - name: Set authorized keys
   template:
-    src: id_rsa.pub.j2
+    src: id_rsa.pub
     dest: /var/lib/one/.ssh/authorized_keys
     owner: oneadmin
     group: oneadmin
-    mode: '0644'
+    mode: '0600'
 
 - name: Set private ssh key
   template:
-    src: id_rsa.j2
+    src: id_rsa
     dest: /var/lib/one/.ssh/id_rsa
     owner: oneadmin
     group: oneadmin
     mode: '0600'
   no_log: true
+
+- name: Add KVM and LXD hostnames on front-end
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ one_host.ip }} kvm.{{ inventory_hostname }} lxd.{{ inventory_hostname }}"
+    regexp: 'kvm.{{ inventory_hostname }}'
+    state: present
+  delegate_to: "{{ one_frontend }}"
+
+- name: Add ssh host key to known hosts on front-end (KVM)
+  known_hosts:
+    name: "kvm.{{ inventory_hostname }}"
+    path: /var/lib/one/.ssh/known_hosts
+    key: "kvm.{{ inventory_hostname }} {{ one_host.key }}"
+    state: present
+  delegate_to: "{{ one_frontend }}"
+
+- name: Add ssh host key to known hosts on front-end (LXD)
+  known_hosts:
+    name: "lxd.{{ inventory_hostname }}"
+    path: /var/lib/one/.ssh/known_hosts
+    key: "lxd.{{ inventory_hostname }} {{ one_host.key }}"
+    state: present
+  delegate_to: "{{ one_frontend }}"

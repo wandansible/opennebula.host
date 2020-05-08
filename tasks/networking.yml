@@ -18,28 +18,19 @@
     name: openvswitch-switch
     state: present
 
-- name: Create bluecables bridge (ovsbr0)
+- name: Create virtual bridges
   openvswitch_bridge:
-    bridge: ovsbr0
+    bridge: "{{ item.bridge }}"
     state: present
+  with_items: "{{ one_host.network_interfaces }}"
 
-- name: Add bluecables port ({{ one_bluecables_port }}) to bluecables bridge (ovsbr0)
+- name: Add external ports to virtual bridges
   openvswitch_port:
-    bridge: ovsbr0
-    port: "{{ one_bluecables_port }}"
+    bridge: "{{ item.bridge }}"
+    port: "{{ item.extport }}"
     state: present
-
-- name: Create redcables bridge (ovsbr1)
-  openvswitch_bridge:
-    bridge: ovsbr1
-    state: present
-
-- name: Add redcables port ({{ one_redcables_port }}) to redcables bridge (ovsbr1)
-  openvswitch_port:
-    bridge: ovsbr1
-    port: "{{ one_redcables_port }}"
-    state: present
+  with_items: "{{ one_host.network_interfaces }}"
 
 - name: Configure private network
   include_tasks: private-net.yml
-  when: one_create_private_net
+  when: one_host.create_private_net

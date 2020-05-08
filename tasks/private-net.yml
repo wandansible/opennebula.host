@@ -6,7 +6,7 @@
 
 - name: Create one-net systemd service
   template:
-    src: one-net.service.j2
+    src: one-net.service
     dest: /etc/systemd/system/one-net.service
     owner: root
     group: root
@@ -15,7 +15,7 @@
 
 - name: Add one-net script
   template:
-    src: one-net.j2
+    src: one-net
     dest: /usr/local/bin/one-net
     owner: root
     group: root
@@ -30,7 +30,7 @@
 
 - name: Configure netplan
   template:
-    src: 20-one-net.yaml.j2
+    src: 20-one-net.yaml
     dest: /etc/netplan/20-one-net.yaml
     owner: root
     group: root

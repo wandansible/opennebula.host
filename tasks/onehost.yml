@@ -1,0 +1,32 @@
+---
+# For some reason these can produce a failed result even when a hosts template
+# is updated successfully. If this occurs, just run through this again
+# and it will produce an ok result instead.
+
+- name: Add host to OpenNebula (KVM)
+  one_host:
+    api_url: "{{ one_api_url }}"
+    api_username: "{{ one_api_username }}"
+    api_password: "{{ one_api_token }}"
+    name: "kvm.{{ inventory_hostname }}"
+    im_mad_name: kvm
+    vmm_mad_name: kvm
+    template:
+      PIN_POLICY: "PINNED"
+      TYPE: "{{ one_host.type }}"
+    state: present
+  delegate_to: "{{ one_frontend }}"
+
+- name: Add host to OpenNebula (LXD)
+  one_host:
+    api_url: "{{ one_api_url }}"
+    api_username: "{{ one_api_username }}"
+    api_password: "{{ one_api_token }}"
+    name: "lxd.{{ inventory_hostname }}"
+    im_mad_name: lxd
+    vmm_mad_name: lxd
+    template:
+      PIN_POLICY: "NONE"
+      TYPE: "{{ one_host.type }}"
+    state: present
+  delegate_to: "{{ one_frontend }}"
