@@ -14,8 +14,15 @@
     template:
       PIN_POLICY: "PINNED"
       TYPE: "{{ one_host.type }}"
+      VMS_THREAD: "{{ one_host.vms_per_thread | default(1) }}"
+      RESERVED_CPU: "{{ one_host.kvm_reserved_cpu | default(0) }}"
+      RESERVED_MEM: "{{ one_host.kvm_reserved_mem | default(0) }}"
+    cluster_id: "{{ one_host.cluster_id }}"
     state: present
   delegate_to: "{{ one_frontend }}"
+  become: false
+  vars:
+    ansible_python_interpreter: /opt/one/venv/bin/python3
 
 - name: Add host to OpenNebula (LXD)
   one_host:
@@ -28,5 +35,11 @@
     template:
       PIN_POLICY: "NONE"
       TYPE: "{{ one_host.type }}"
+      RESERVED_CPU: "{{ one_host.lxd_reserved_cpu | default(0) }}"
+      RESERVED_MEM: "{{ one_host.lxd_reserved_mem | default(0) }}"
+    cluster_id: "{{ one_host.cluster_id }}"
     state: present
   delegate_to: "{{ one_frontend }}"
+  become: false
+  vars:
+    ansible_python_interpreter: /opt/one/venv/bin/python3

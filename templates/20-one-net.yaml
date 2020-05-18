@@ -4,7 +4,7 @@ network:
   version: 2
   renderer: networkd
   ethernets:
-    ovsbr1:
+    br-redcables:
       dhcp4: true
       routes:
         - to: 0.0.0.0/0
@@ -14,7 +14,7 @@ network:
           scope: link
           table: 101
       optional: false
-    ovsbr2:
+    br-private:
       addresses:
         - 192.168.0.254/24
       routes:
@@ -26,8 +26,8 @@ network:
           table: 101
       optional: false
   bridges:
-    virbr0:
+    br0:
       interfaces:
-        - ovsbr1
-        - ovsbr2
+        - br-redcables
+        - br-private
       optional: false

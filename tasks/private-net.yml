@@ -1,7 +1,7 @@
 ---
-- name: Create private network bridge (ovsbr2)
+- name: Create private network bridge (br-private)
   openvswitch_bridge:
-    bridge: ovsbr2
+    bridge: br-private
     state: present
 
 - name: Create one-net systemd service
