@@ -33,4 +33,4 @@
 
 - name: Configure private network
   include_tasks: private-net.yml
-  when: one_host.create_private_net
+  when: one_host.private_net is defined

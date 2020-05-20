@@ -1,33 +1,39 @@
+#jinja2: trim_blocks: "false", lstrip_blocks: "true"
 # {{ ansible_managed }}
 
 network:
   version: 2
   renderer: networkd
   ethernets:
-    br-redcables:
+    {{ one_host.private_net.external.bridge }}:
+      {% if one_host.private_net.external.ip is defined %}
+      addresses:
+        - {{ one_host.private_net.external.ip }}
+      {% else %}
       dhcp4: true
+      {% endif %}
       routes:
         - to: 0.0.0.0/0
-          via: 163.7.137.254
+          via: {{ one_host.private_net.external.gateway }}
           table: 101
-        - to: 163.7.137.0/24
+        - to: {{ one_host.private_net.external.network }}
           scope: link
           table: 101
       optional: false
-    br-private:
+    {{ one_host.private_net.internal.bridge }}:
       addresses:
-        - 192.168.0.254/24
+        - {{ one_host.private_net.internal.ip }}
       routes:
-        - to: 192.168.0.0/24
+        - to: {{ one_host.private_net.internal.network }}
           scope: link
           table: 101
       routing-policy:
-        - from: 192.168.0.0/24
+        - from: {{ one_host.private_net.internal.network }}
           table: 101
       optional: false
   bridges:
-    br0:
+    {{ one_host.private_net.bridge }}:
       interfaces:
-        - br-redcables
-        - br-private
+        - {{ one_host.private_net.external.bridge }}
+        - {{ one_host.private_net.internal.bridge }}
       optional: false

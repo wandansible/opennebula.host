@@ -3,10 +3,10 @@
 
 # Route IPv4 but bridge IPv6
 ebtables -t broute -F
-ebtables -t broute -A BROUTING -p ipv4 -i br-redcables -j DROP
-ebtables -t broute -A BROUTING -p ipv4 -i br-private -j DROP
-ebtables -t broute -A BROUTING -p arp -i br-redcables -j DROP
-ebtables -t broute -A BROUTING -p arp -i br-private -j DROP
+ebtables -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.external.bridge }} -j DROP
+ebtables -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.internal.bridge }} -j DROP
+ebtables -t broute -A BROUTING -p arp -i {{ one_host.private_net.external.bridge }} -j DROP
+ebtables -t broute -A BROUTING -p arp -i {{ one_host.private_net.internal.bridge }} -j DROP
 
-# Make sure firewall rules are loaded for br-redcables and br-private
+# Make sure firewall rules are loaded for ovs bridge interfaces
 bearwall2

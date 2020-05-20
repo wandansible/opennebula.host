@@ -1,7 +1,7 @@
 ---
-- name: Create private network bridge (br-private)
+- name: Create private network bridge ({{ one_host.private_net.internal.bridge }})
   openvswitch_bridge:
-    bridge: br-private
+    bridge: "{{ one_host.private_net.internal.bridge }}"
     state: present
 
 - name: Create one-net systemd service
