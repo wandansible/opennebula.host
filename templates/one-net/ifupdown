@@ -1,0 +1,29 @@
+#jinja2: trim_blocks: "false", lstrip_blocks: "true"
+# {{ ansible_managed }}
+
+auto {{ one_host.private_net.external.bridge }}
+iface {{ one_host.private_net.external.bridge }} inet {{ "static" if one_host.private_net.external.ip is defined else "dhcp" }}
+    {% if one_host.private_net.external.ip is defined %}
+    address {{ one_host.private_net.external.ip }}
+    {% endif %}
+    up ip route add default via {{ one_host.private_net.external.gateway }} table 101 || true
+    up ip route add {{ one_host.private_net.external.network }} dev {{ one_host.private_net.external.bridge }} table 101 || true
+    down ip route del default via {{ one_host.private_net.external.gateway }} table 101 || true
+    down ip route del {{ one_host.private_net.external.network }} dev {{ one_host.private_net.external.bridge }} table 101 || true
+
+auto {{ one_host.private_net.internal.bridge }}
+iface {{ one_host.private_net.internal.bridge }} inet static
+    address {{ one_host.private_net.internal.ip }}
+    up ip route add {{ one_host.private_net.internal.network }} dev {{ one_host.private_net.internal.bridge }} table 101 || true
+    up ip rule add from {{ one_host.private_net.internal.network }} table 101 || true
+    down ip route del {{ one_host.private_net.internal.network }} dev {{ one_host.private_net.internal.bridge }} table 101 || true
+    down ip rule del from {{ one_host.private_net.internal.network }} table 101 || true
+
+auto {{ one_host.private_net.bridge }}
+iface {{ one_host.private_net.bridge }} inet manual
+    bridge_ports {{ one_host.private_net.external.bridge }} {{ one_host.private_net.internal.bridge }}
+    up ebtables-legacy -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.external.bridge }} -j DROP
+    up ebtables-legacy -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.internal.bridge }} -j DROP
+    up ebtables-legacy -t broute -A BROUTING -p arp -i {{ one_host.private_net.external.bridge }} -j DROP
+    up ebtables-legacy -t broute -A BROUTING -p arp -i {{ one_host.private_net.internal.bridge }} -j DROP
+    down ebtables-legacy -t broute -F

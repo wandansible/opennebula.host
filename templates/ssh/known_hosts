@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+{{ one_frontend }} {{ one_frontend_key }}
+{% for item in one_related_hosts %}
+kvm.{{ item.inventory_hostname }} {{ item.one_host.key }}
+lxd.{{ item.inventory_hostname }} {{ item.one_host.key }}
+{% endfor %}

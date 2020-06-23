@@ -1,62 +1,26 @@
 ---
-- name: Add front-end ssh host key to known hosts
-  known_hosts:
-    name: "{{ one_frontend }}"
-    path: /var/lib/one/.ssh/known_hosts
-    key: "{{ one_frontend }} {{ one_frontend_key }}"
-    state: present
-
-- name: Set known hosts file ownership
-  file:
-    path: /var/lib/one/.ssh/known_hosts
-    owner: oneadmin
-    group: oneadmin
-
-- name: Set public ssh key
-  template:
-    src: id_ed25519.pub
-    dest: /var/lib/one/.ssh/id_ed25519.pub
-    owner: oneadmin
-    group: oneadmin
-    mode: '0644'
-
 - name: Set authorized keys
   template:
-    src: id_ed25519.pub
+    src: ssh/authorized_keys
     dest: /var/lib/one/.ssh/authorized_keys
     owner: oneadmin
     group: oneadmin
-    mode: '0600'
+    mode: u=rw,g=,o=
 
-- name: Set private ssh key
-  template:
-    src: id_ed25519
-    dest: /var/lib/one/.ssh/id_ed25519
-    owner: oneadmin
-    group: oneadmin
-    mode: '0600'
-  no_log: true
-
-- name: Add KVM and LXD hostnames on front-end
+- name: Add KVM and LXD hostnames for all hosts
   lineinfile:
     path: /etc/hosts
-    line: "{{ one_host.ip }} kvm.{{ inventory_hostname }} lxd.{{ inventory_hostname }}"
-    regexp: 'kvm.{{ inventory_hostname }}'
+    line: "{{ item.one_host.ip }} kvm.{{ item.inventory_hostname }} lxd.{{ item.inventory_hostname }}"
+    regexp: 'kvm.{{ item.inventory_hostname }}'
     state: present
-  delegate_to: "{{ one_frontend }}"
+  with_items: "{{ one_related_hosts }}"
+  loop_control:
+      label: "{{ item.inventory_hostname }}"
 
-- name: Add ssh host key to known hosts on front-end (KVM)
-  known_hosts:
-    name: "kvm.{{ inventory_hostname }}"
-    path: /var/lib/one/.ssh/known_hosts
-    key: "kvm.{{ inventory_hostname }} {{ one_host.key }}"
-    state: present
-  delegate_to: "{{ one_frontend }}"
-
-- name: Add ssh host key to known hosts on front-end (LXD)
-  known_hosts:
-    name: "lxd.{{ inventory_hostname }}"
-    path: /var/lib/one/.ssh/known_hosts
-    key: "lxd.{{ inventory_hostname }} {{ one_host.key }}"
-    state: present
-  delegate_to: "{{ one_frontend }}"
+- name: Configure known hosts
+  template:
+    src: ssh/known_hosts
+    dest: /var/lib/one/.ssh/known_hosts
+    owner: oneadmin
+    group: oneadmin
+    mode: u=rw,g=,o=

@@ -1,0 +1,9 @@
+#!/bin/sh
+# {{ ansible_managed }}
+
+# Route IPv4 but bridge IPv6
+ebtables-legacy -t broute -F
+ebtables-legacy -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.external.bridge }} -j DROP
+ebtables-legacy -t broute -A BROUTING -p ipv4 -i {{ one_host.private_net.internal.bridge }} -j DROP
+ebtables-legacy -t broute -A BROUTING -p arp -i {{ one_host.private_net.external.bridge }} -j DROP
+ebtables-legacy -t broute -A BROUTING -p arp -i {{ one_host.private_net.internal.bridge }} -j DROP
