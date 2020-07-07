@@ -1,4 +1,5 @@
 ---
+one_apt_key_fingerprint: "92B77188854CF23E1634DA89592F7F0585E16EBF"
 one_version: "5.10"
 one_datastores: []
 one_create_private_net: false

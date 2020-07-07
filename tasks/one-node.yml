@@ -6,6 +6,7 @@
 
 - name: Add OpenNebula apt signing key
   apt_key:
+    id: "{{ one_apt_key_fingerprint }}"
     url: https://downloads.opennebula.org/repo/repo.key
     state: present
 
