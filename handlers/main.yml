@@ -4,9 +4,9 @@
     name: lxd
     state: restarted
 
-- name: restart libvirt-bin
+- name: restart libvirtd
   service:
-    name: libvirt-bin
+    name: libvirtd
     state: restarted
 
 - name: systemd daemon-reload
@@ -20,3 +20,8 @@
 
 - name: netplan apply
   command: netplan apply
+
+- name: restart networking
+  service:
+    name: networking.service
+    state: restarted

@@ -1,9 +1,4 @@
 ---
-- name: Install LXD
-  apt:
-    name: lxd
-    state: present
-
 - name: Add OpenNebula apt signing key
   apt_key:
     id: "{{ one_apt_key_fingerprint }}"
@@ -17,10 +12,14 @@
     update_cache: yes
     state: present
 
+- name: Install opennebula-node
+  apt:
+    name: opennebula-node
+    state: present
+  notify:
+    - restart libvirtd
+
 - name: Install opennebula-node-lxd
   apt:
     name: opennebula-node-lxd
     state: present
-  notify:
-    - restart lxd
-    - restart libvirt-bin
