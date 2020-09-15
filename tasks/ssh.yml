@@ -10,12 +10,15 @@
 - name: Add KVM and LXD hostnames for all hosts
   lineinfile:
     path: /etc/hosts
-    line: "{{ item.one_host.ip }} kvm.{{ item.inventory_hostname }} lxd.{{ item.inventory_hostname }}"
-    regexp: 'kvm.{{ item.inventory_hostname }}'
+    line: "{{ _host.one_host.ip }} kvm.{{ _host.inventory_hostname }} lxd.{{ _host.inventory_hostname }}"
+    regexp: 'kvm.{{ _host.inventory_hostname }}'
     state: present
-  with_items: "{{ one_related_hosts }}"
-  loop_control:
-      label: "{{ item.inventory_hostname }}"
+  loop: "{{ groups.opennebula_host_servers }}"
+  vars:
+    _host: "{{ hostvars[item] }}"
+  when:
+    - _host.one_frontend is defined
+    - _host.one_frontend == one_frontend
 
 - name: Configure known hosts
   template:

@@ -1,7 +1,11 @@
+#jinja2: trim_blocks: "false", lstrip_blocks: "true"
 # {{ ansible_managed }}
 
 {{ one_frontend }} {{ one_frontend_key }}
-{% for item in one_related_hosts %}
-kvm.{{ item.inventory_hostname }} {{ item.one_host.key }}
-lxd.{{ item.inventory_hostname }} {{ item.one_host.key }}
+{% for item in groups.opennebula_host_servers %}
+    {% set _host = hostvars[item] %}
+    {% if _host.one_frontend is defined and _host.one_frontend == one_frontend %}
+kvm.{{ _host.inventory_hostname }} {{ _host.one_host.key }}
+lxd.{{ _host.inventory_hostname }} {{ _host.one_host.key }}
+    {% endif %}
 {% endfor %}

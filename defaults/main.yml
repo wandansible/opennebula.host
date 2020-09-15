@@ -6,5 +6,3 @@ one_datastores: []
 one_api_url: http://127.0.0.1:2633/RPC2
 one_api_username: "{{ lookup('file', '~/.one/one_auth').split(':')[0] | trim }}"
 one_api_token: "{{ lookup('file', '~/.one/one_auth').split(':')[1] | trim }}"
-
-one_related_hosts: "{{ hostvars | dict2items | map(attribute='value') | selectattr('one_host', 'defined') | selectattr('one_frontend', 'defined') | selectattr('one_frontend', 'equalto', one_frontend) | list }}"
