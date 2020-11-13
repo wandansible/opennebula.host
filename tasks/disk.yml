@@ -22,6 +22,8 @@
     fstype: ext4
     state: mounted
   loop: "{{ one_datastores }}"
+  loop_control:
+    label: "{{ item.id }}"
 
 - name: Set ownership and permissions for individual OpenNebula datastores
   file:
@@ -31,3 +33,5 @@
     group: oneadmin
     mode: '0755'
   loop: "{{ one_datastores }}"
+  loop_control:
+    label: "{{ item.id }}"
