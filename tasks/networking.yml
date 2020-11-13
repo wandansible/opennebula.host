@@ -22,14 +22,14 @@
   openvswitch_bridge:
     bridge: "{{ item.bridge }}"
     state: present
-  with_items: "{{ one_host.network_interfaces }}"
+  loop: "{{ one_host.network_interfaces }}"
 
 - name: Add external ports to virtual bridges
   openvswitch_port:
     bridge: "{{ item.bridge }}"
     port: "{{ item.extport }}"
     state: present
-  with_items: "{{ one_host.network_interfaces }}"
+  loop: "{{ one_host.network_interfaces }}"
 
 - name: Configure private network
   include_tasks: private-net.yml

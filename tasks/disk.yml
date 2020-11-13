@@ -21,7 +21,7 @@
     src: UUID={{ item.disk_uuid }}
     fstype: ext4
     state: mounted
-  with_items: "{{ one_datastores }}"
+  loop: "{{ one_datastores }}"
 
 - name: Set ownership and permissions for individual OpenNebula datastores
   file:
@@ -30,4 +30,4 @@
     owner: oneadmin
     group: oneadmin
     mode: '0755'
-  with_items: "{{ one_datastores }}"
+  loop: "{{ one_datastores }}"
