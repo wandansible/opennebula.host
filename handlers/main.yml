@@ -19,7 +19,8 @@
     state: restarted
 
 - name: netplan apply
-  command: netplan apply
+  command:
+    cmd: netplan apply
 
 - name: restart networking
   service:

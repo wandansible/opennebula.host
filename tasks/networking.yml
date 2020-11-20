@@ -1,16 +1,19 @@
 ---
 - name: Get default libvirt network info
-  command: virsh net-info default
+  command:
+    cmd: virsh net-info default
   register: result
   ignore_errors: true
   changed_when: false
 
 - name: Stop default libvirt network
-  command: virsh net-destroy default
+  command:
+    cmd: virsh net-destroy default
   when: 'result.stdout is search("Active:\s+yes")'
 
 - name: Disable autostart for default libvirt network
-  command: virsh net-autostart --network default --disable
+  command:
+    cmd: virsh net-autostart --network default --disable
   when: 'result.stdout is search("Autostart:\s+yes")'
 
 - name: Install openvswitch-switch
@@ -36,5 +39,6 @@
     label: "{{ item.extport }}"
 
 - name: Configure private network
-  include_tasks: private-net.yml
+  include_tasks:
+    file: private-net.yml
   when: one_host.private_net is defined
