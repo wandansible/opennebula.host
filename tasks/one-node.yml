@@ -14,12 +14,12 @@
 
 - name: Install opennebula-node
   apt:
-    name: opennebula-node
+    name: opennebula-node={{ one_install_version }}*
     state: present
   notify:
     - restart libvirtd
 
 - name: Install opennebula-node-lxd
   apt:
-    name: opennebula-node-lxd
+    name: opennebula-node-lxd={{ one_install_version }}*
     state: present
