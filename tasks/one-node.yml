@@ -2,24 +2,19 @@
 - name: Add OpenNebula apt signing key
   apt_key:
     id: "{{ one_apt_key_fingerprint }}"
-    url: https://downloads.opennebula.org/repo/repo.key
+    url: https://downloads.opennebula.io/repo/repo.key
     state: present
 
 - name: Add OpenNebula {{ one_version }} apt repository
   apt_repository:
-    repo: deb https://downloads.opennebula.org/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
+    repo: deb https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
     filename: opennebula
     update_cache: yes
     state: present
 
-- name: Install opennebula-node
+- name: Install opennebula-node-kvm
   apt:
-    name: opennebula-node={{ one_install_version }}*
+    name: opennebula-node-kvm={{ one_install_version }}*
     state: present
   notify:
     - restart libvirtd
-
-- name: Install opennebula-node-lxd
-  apt:
-    name: opennebula-node-lxd={{ one_install_version }}*
-    state: present

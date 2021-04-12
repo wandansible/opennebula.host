@@ -7,19 +7,6 @@
     group: oneadmin
     mode: u=rw,g=,o=
 
-- name: Add KVM and LXD hostnames for all hosts
-  lineinfile:
-    path: /etc/hosts
-    line: "{{ _host.one_host.ip }} kvm.{{ _host.inventory_hostname }} lxd.{{ _host.inventory_hostname }}"
-    regexp: 'kvm.{{ _host.inventory_hostname }}'
-    state: present
-  loop: "{{ groups.opennebula_host_servers }}"
-  vars:
-    _host: "{{ hostvars[item] }}"
-  when:
-    - _host.one_frontend is defined
-    - _host.one_frontend == one_frontend
-
 - name: Configure known hosts
   template:
     src: ssh/known_hosts

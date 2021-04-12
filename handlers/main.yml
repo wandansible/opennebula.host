@@ -1,9 +1,4 @@
 ---
-- name: restart lxd
-  service:
-    name: lxd
-    state: restarted
-
 - name: restart libvirtd
   service:
     name: libvirtd

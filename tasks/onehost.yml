@@ -1,42 +1,18 @@
 ---
-# For some reason these can produce a failed result even when a hosts template
-# is updated successfully. If this occurs, just run through this again
-# and it will produce an ok result instead.
-
-- name: Add host to OpenNebula (KVM)
+- name: Add host to OpenNebula
   one_host:
     api_url: "{{ one_api_url }}"
     api_username: "{{ one_api_username }}"
     api_password: "{{ one_api_token }}"
-    name: "kvm.{{ inventory_hostname }}"
+    name: "{{ inventory_hostname }}"
     im_mad_name: kvm
     vmm_mad_name: kvm
     template:
-      PIN_POLICY: "PINNED"
+      PIN_POLICY: "{{ 'PINNED' if one_host.vms_pinned | default(false) | bool else 'NONE' }}"
       TYPE: "{{ one_host.type }}"
       VMS_THREAD: "{{ one_host.vms_per_thread | default(1) }}"
-      RESERVED_CPU: "{{ one_host.kvm_reserved_cpu | default(0) }}"
-      RESERVED_MEM: "{{ one_host.kvm_reserved_mem | default(0) }}"
-    cluster_id: "{{ one_host.cluster_id }}"
-    state: present
-  delegate_to: "{{ one_frontend }}"
-  become: false
-  vars:
-    ansible_python_interpreter: /opt/one/venv/bin/python3
-
-- name: Add host to OpenNebula (LXD)
-  one_host:
-    api_url: "{{ one_api_url }}"
-    api_username: "{{ one_api_username }}"
-    api_password: "{{ one_api_token }}"
-    name: "lxd.{{ inventory_hostname }}"
-    im_mad_name: lxd
-    vmm_mad_name: lxd
-    template:
-      PIN_POLICY: "NONE"
-      TYPE: "{{ one_host.type }}"
-      RESERVED_CPU: "{{ one_host.lxd_reserved_cpu | default(0) }}"
-      RESERVED_MEM: "{{ one_host.lxd_reserved_mem | default(0) }}"
+      RESERVED_CPU: "{{ one_host.reserved_cpu | default(0) }}"
+      RESERVED_MEM: "{{ one_host.reserved_mem | default(0) }}"
     cluster_id: "{{ one_host.cluster_id }}"
     state: present
   delegate_to: "{{ one_frontend }}"
