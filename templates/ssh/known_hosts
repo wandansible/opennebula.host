@@ -2,7 +2,7 @@
 # {{ ansible_managed }}
 
 {{ one_frontend }} {{ one_frontend_key }}
-{% for item in groups.opennebula_host_servers %}
+{% for item in groups.opennebula_host_servers | sort %}
     {% set _host = hostvars[item] %}
     {% if item != one_frontend and _host.one_frontend is defined and _host.one_frontend == one_frontend %}
 {{ item }} {{ _host.one_host.key }}
