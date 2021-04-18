@@ -16,6 +16,19 @@
     cmd: virsh net-autostart --network default --disable
   when: 'result.stdout is search("Autostart:\s+yes")'
 
+- name: Add wand Open vSwitch apt signing key
+  ansible.builtin.apt_key:
+    url: https://dl.cloudsmith.io/public/wand/openvswitch/gpg.2E801E8CCE233F26.key
+    id: "{{ openvswitch_apt_key_fingerprint }}"
+    state: present
+
+- name: Add wand Open vSwitch apt repository
+  ansible.builtin.apt_repository:
+    repo: deb https://dl.cloudsmith.io/public/wand/openvswitch/deb/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+    filename: wand-openvswitch
+    update_cache: yes
+    state: present
+
 - name: Install openvswitch-switch
   apt:
     name: openvswitch-switch
