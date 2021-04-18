@@ -15,6 +15,7 @@
 - name: Install opennebula-node-kvm
   apt:
     name: opennebula-node-kvm={{ one_install_version }}*
+    install_recommends: no
     state: present
   notify:
     - restart libvirtd
