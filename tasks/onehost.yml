@@ -3,7 +3,7 @@
   one_host:
     api_url: "{{ one_api_url }}"
     api_username: "{{ one_api_username }}"
-    api_password: "{{ one_api_token }}"
+    api_password: "{{ one_api_password }}"
     name: "{{ inventory_hostname }}"
     im_mad_name: kvm
     vmm_mad_name: kvm

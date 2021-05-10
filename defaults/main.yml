@@ -6,6 +6,6 @@ one_datastores: []
 
 one_api_url: http://127.0.0.1:2633/RPC2
 one_api_username: "{{ lookup('file', '~/.one/one_auth').split(':')[0] | trim }}"
-one_api_token: "{{ lookup('file', '~/.one/one_auth').split(':')[1] | trim }}"
+one_api_password: "{{ lookup('file', '~/.one/one_auth').split(':')[1] | trim }}"
 
 openvswitch_apt_key_fingerprint: "DB9F174579DDD023268CF8F82E801E8CCE233F26"
