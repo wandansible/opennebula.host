@@ -1,4 +1,30 @@
 ---
+- name: Check if host cluster exists in OpenNebula
+  ansible.builtin.command:
+    cmd: >-
+      onecluster show
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ inventory_hostname }}"
+  delegate_to: "{{ one_frontend }}"
+  become: false
+  no_log: true
+  register: _one_cluster_check
+  changed_when: false
+  failed_when: _one_cluster_check.rc != 0 and 'not found' not in _one_cluster_check.stderr
+      
+- name: Add host cluster to OpenNebula
+  ansible.builtin.command:
+    cmd: >-
+      onecluster create
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ inventory_hostname }}"
+  when: _one_cluster_check.rc != 0
+  delegate_to: "{{ one_frontend }}"
+  become: false
+  no_log: true
+
 - name: Add host to OpenNebula
   one_host:
     api_url: "{{ one_api_url }}"
