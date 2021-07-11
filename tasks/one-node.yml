@@ -19,3 +19,8 @@
     state: present
   notify:
     - restart libvirtd
+
+- name: Install xfsprogs
+  ansible.builtin.apt:
+    name: xfsprogs
+    state: present
