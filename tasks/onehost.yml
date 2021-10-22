@@ -12,7 +12,7 @@
   register: _one_cluster_check
   changed_when: false
   failed_when: _one_cluster_check.rc != 0 and 'not found' not in _one_cluster_check.stderr
-      
+
 - name: Add host cluster to OpenNebula
   ansible.builtin.command:
     cmd: >-
