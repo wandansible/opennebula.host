@@ -2,7 +2,7 @@
 one_apt_key_fingerprint: "92B77188854CF23E1634DA89592F7F0585E16EBF"
 one_install_version: "6.0.0.2"
 one_version: "{{ one_install_version | regex_replace('^(\\d+\\.\\d+).*', '\\1') }}"
-one_datastores: []
+one_datastore_mounts: []
 one_lvm_datastores: []
 one_host_datastores:
   - Default

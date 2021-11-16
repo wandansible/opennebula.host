@@ -21,7 +21,7 @@
     src: UUID={{ item.disk_uuid }}
     fstype: ext4
     state: mounted
-  loop: "{{ one_datastores }}"
+  loop: "{{ one_datastore_mounts }}"
   loop_control:
     label: "{{ item.id }}"
 
@@ -32,6 +32,6 @@
     owner: oneadmin
     group: oneadmin
     mode: '0755'
-  loop: "{{ one_datastores }}"
+  loop: "{{ one_datastore_mounts }}"
   loop_control:
     label: "{{ item.id }}"
