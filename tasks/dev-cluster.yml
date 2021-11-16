@@ -1,0 +1,35 @@
+---
+- name: Add host to the default OpenNebula VDC
+  ansible.builtin.command:
+    cmd: >-
+      onevdc addhost
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ one_default_vdc }}" 0
+      "{{ inventory_hostname }}"
+  delegate_to: "{{ one_frontend }}"
+  no_log: true
+  register: _one_vdc_host
+  changed_when: _one_vdc_host.rc == 0
+  failed_when:
+    - _one_vdc_host.rc != 0
+    - "'already assigned to the VDC' not in _one_vdc_host.stderr"
+
+- name: Add LVM datastores to the default OpenNebula VDC
+  ansible.builtin.command:
+    cmd: >-
+      onevdc adddatastore
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ one_default_vdc }}" 0
+      "{{ inventory_hostname }} {{ item.tier }}"
+  loop: "{{ one_lvm_datastores }}"
+  loop_control:
+    label: "{{ inventory_hostname }} {{ item.tier }}"
+  delegate_to: "{{ one_frontend }}"
+  no_log: true
+  register: _one_vdc_ds
+  changed_when: _one_vdc_ds.rc == 0
+  failed_when:
+    - _one_vdc_ds.rc != 0
+    - "'already assigned to the VDC' not in _one_vdc_ds.stderr"

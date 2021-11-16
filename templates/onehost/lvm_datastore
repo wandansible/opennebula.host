@@ -1,0 +1,13 @@
+NAME = "{{ inventory_hostname }} {{ item.tier }}"
+TYPE = IMAGE_DS
+DS_MAD = lvm
+TM_MAD = lvm
+DISK_TYPE = BLOCK
+VG_NAME = "{{ item.vg }}"
+BRIDGE_LIST = "{{ inventory_hostname }}"
+{% if item.mkfs_ext_opts is defined and item.mkfs_ext_opts != "" %}
+MKFS_EXT_OPTS = "{{ item.mkfs_ext_opts }}"
+{% endif %}
+{% if item.mkfs_xfs_opts is defined and item.mkfs_xfs_opts != "" %}
+MKFS_XFS_OPTS = "{{ item.mkfs_xfs_opts }}"
+{% endif %}

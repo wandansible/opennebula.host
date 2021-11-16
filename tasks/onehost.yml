@@ -35,13 +35,117 @@
     vmm_mad_name: kvm
     template:
       PIN_POLICY: "{{ 'PINNED' if one_host.vms_pinned | default(false) | bool else 'NONE' }}"
-      TYPE: "{{ one_host.type }}"
+      TYPE: "{{ one_host.type | default(one_host_type) }}"
       VMS_THREAD: "{{ one_host.vms_per_thread | default(1) }}"
       RESERVED_CPU: "{{ one_host.reserved_cpu | default(0) }}"
       RESERVED_MEM: "{{ one_host.reserved_mem | default(0) }}"
+      STORAGE_TIERS: "{{ one_lvm_datastores | map(attribute='tier') | sort | join(' & ') }}"
     cluster_id: "{{ one_host.cluster_id }}"
     state: present
   delegate_to: "{{ one_frontend }}"
   become: false
   vars:
     ansible_python_interpreter: /opt/one/venv/bin/python3
+
+- name: Check if OpenNebula datastores are added to host cluster
+  ansible.builtin.command:
+    cmd: >-
+      onedatastore show
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ item }}"
+  loop: "{{ one_host.datastores | default(one_host_datastores) }}"
+  delegate_to: "{{ one_frontend }}"
+  become: false
+  no_log: true
+  register: _one_ds_check
+  changed_when: false
+
+- name: Add OpenNebula datastores to host cluster
+  ansible.builtin.command:
+    cmd: >-
+      onecluster adddatastore
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ one_host.cluster_id }}" "{{ item }}"
+  when: one_host.cluster_id | string not in ((_one_ds_check.results[index].stdout | regex_search('CLUSTERS\\s*:\\s*([\\d,]+)', '\\1'))[0] | split(','))
+  loop: "{{ one_host.datastores | default(one_host_datastores) }}"
+  loop_control:
+    index_var: index
+  delegate_to: "{{ one_frontend }}"
+  become: false
+  no_log: true
+
+- name: Add OpenNebula templates directory
+  ansible.builtin.file:
+    state: directory
+    path: /var/lib/one/templates
+    owner: oneadmin
+    group: oneadmin
+    mode: u=rwx,g=rx,o=rx
+  delegate_to: "{{ one_frontend }}"
+
+- name: Upload OpenNebula LVM datastore templates to frontend
+  ansible.builtin.template:
+    src: onehost/lvm_datastore
+    dest: /var/lib/one/templates/one_ds_{{ inventory_hostname }}_{{ item.tier }}.tmpl
+    owner: oneadmin
+    group: oneadmin
+    mode: u=rw,g=r,o=r
+  loop: "{{ one_lvm_datastores }}"
+  loop_control:
+    label: "{{ inventory_hostname }} {{ item.tier }}"
+  delegate_to: "{{ one_frontend }}"
+  register: _one_template_upload
+
+- name: Check if LVM datastores exist in OpenNebula
+  ansible.builtin.command:
+    cmd: >-
+      onedatastore show
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ inventory_hostname }} {{ item.tier }}"
+  loop: "{{ one_lvm_datastores }}"
+  loop_control:
+    label: "{{ inventory_hostname }} {{ item.tier }}"
+  delegate_to: "{{ one_frontend }}"
+  become: false
+  no_log: true
+  register: _one_lvm_check
+  changed_when: false
+  failed_when:
+    - _one_lvm_check.rc != 0
+    - "'not found' not in _one_lvm_check.stderr"
+
+- name: Add LVM datastores to OpenNebula
+  ansible.builtin.command:
+    cmd: >-
+      onedatastore create
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      --cluster "{{ one_host.cluster_id }}"
+      "/var/lib/one/templates/one_ds_{{ inventory_hostname }}_{{ item.tier }}.tmpl"
+  when: _one_lvm_check.results[index].rc != 0
+  loop: "{{ one_lvm_datastores }}"
+  loop_control:
+    label: "{{ inventory_hostname }} {{ item.tier }}"
+    index_var: index
+  delegate_to: "{{ one_frontend }}"
+  no_log: true
+
+- name: Update LVM datastores in OpenNebula
+  ansible.builtin.command:
+    cmd: >-
+      onedatastore update
+      --user "{{ one_api_username }}"
+      --password "{{ one_api_password }}"
+      "{{ inventory_hostname }} {{ item.tier }}"
+      "/var/lib/one/templates/one_ds_{{ inventory_hostname }}_{{ item.tier }}.tmpl"
+  when: _one_lvm_check.results[index].rc == 0
+  loop: "{{ one_lvm_datastores }}"
+  loop_control:
+    label: "{{ inventory_hostname }} {{ item.tier }}"
+    index_var: index
+  delegate_to: "{{ one_frontend }}"
+  no_log: true
+  changed_when: _one_template_upload.results[index] is changed
