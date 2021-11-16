@@ -13,3 +13,7 @@
 
 - name: Configure OpenNebula host
   import_tasks: onehost.yml
+
+- name: Run tasks specific to development clusters
+  import_tasks: dev-cluster.yml
+  when: one_host.type | default(one_host_type) == "development"
