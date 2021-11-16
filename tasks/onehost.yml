@@ -53,6 +53,7 @@
       onedatastore show
       --user "{{ one_api_username }}"
       --password "{{ one_api_password }}"
+      --yaml
       "{{ item }}"
   loop: "{{ one_host.datastores | default(one_host_datastores) }}"
   delegate_to: "{{ one_frontend }}"
@@ -68,7 +69,7 @@
       --user "{{ one_api_username }}"
       --password "{{ one_api_password }}"
       "{{ one_host.cluster_id }}" "{{ item }}"
-  when: one_host.cluster_id | string not in ((_one_ds_check.results[index].stdout | regex_search('CLUSTERS\\s*:\\s*([\\d,]+)', '\\1'))[0] | split(','))
+  when: one_host.cluster_id | string not in (_one_ds_check.results[index].stdout | from_yaml).DATASTORE.CLUSTERS.ID
   loop: "{{ one_host.datastores | default(one_host_datastores) }}"
   loop_control:
     index_var: index
