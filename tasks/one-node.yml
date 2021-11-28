@@ -24,3 +24,8 @@
   ansible.builtin.apt:
     name: xfsprogs
     state: present
+
+- name: Install xmllint command
+  ansible.builtin.apt:
+    name: libxml2-utils
+    state: present
