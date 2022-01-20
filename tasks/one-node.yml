@@ -1,13 +1,27 @@
 ---
+- name: Remove old OpenNebula apt repository entry
+  ansible.builtin.apt_repository:
+    repo: deb https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
+    filename: opennebula
+    update_cache: no
+    state: absent
+
+- name: Remove OpenNebula apt signing key from default apt keyring
+  ansible.builtin.apt_key:
+    id: "{{ one_apt_key_fingerprint }}"
+    keyring: /etc/apt/trusted.gpg
+    state: absent
+
 - name: Add OpenNebula apt signing key
   apt_key:
     id: "{{ one_apt_key_fingerprint }}"
     url: https://downloads.opennebula.io/repo/repo.key
+    keyring: /usr/share/keyrings/opennebula.gpg
     state: present
 
 - name: Add OpenNebula {{ one_version }} apt repository
   apt_repository:
-    repo: deb https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
+    repo: deb [signed-by=/usr/share/keyrings/opennebula.gpg] https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
     filename: opennebula
     update_cache: yes
     state: present
