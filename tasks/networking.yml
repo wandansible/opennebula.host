@@ -52,6 +52,5 @@
     label: "{{ item.extport }}"
 
 - name: Configure private network
-  ansible.builtin.import_tasks:
-    file: private-net.yml
+  ansible.builtin.import_tasks: private-net.yml
   when: one_host.private_net is defined
