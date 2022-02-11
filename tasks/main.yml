@@ -1,19 +1,19 @@
 ---
 - name: Install OpenNebula node software
-  import_tasks: one-node.yml
+  ansible.builtin.import_tasks: one-node.yml
 
 - name: Configure networking
-  import_tasks: networking.yml
+  ansible.builtin.import_tasks: networking.yml
 
 - name: Configure disks
-  import_tasks: disk.yml
+  ansible.builtin.import_tasks: disk.yml
 
 - name: Configure passwordless ssh
-  import_tasks: ssh.yml
+  ansible.builtin.import_tasks: ssh.yml
 
 - name: Configure OpenNebula host
-  import_tasks: onehost.yml
+  ansible.builtin.import_tasks: onehost.yml
 
 - name: Run tasks specific to development clusters
-  import_tasks: dev-cluster.yml
+  ansible.builtin.import_tasks: dev-cluster.yml
   when: one_host.type | default(one_host_type) == "development"

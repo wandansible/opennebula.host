@@ -1,6 +1,6 @@
 ---
 - name: Set authorized keys
-  template:
+  ansible.builtin.template:
     src: ssh/authorized_keys
     dest: /var/lib/one/.ssh/authorized_keys
     owner: oneadmin
@@ -8,7 +8,7 @@
     mode: u=rw,g=,o=
 
 - name: Configure known hosts
-  template:
+  ansible.builtin.template:
     src: ssh/known_hosts
     dest: /var/lib/one/.ssh/known_hosts
     owner: oneadmin
