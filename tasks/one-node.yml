@@ -13,21 +13,24 @@
     state: absent
 
 - name: Add OpenNebula apt signing key
-  apt_key:
+  ansible.builtin.apt_key:
     id: "{{ one_apt_key_fingerprint }}"
     url: https://downloads.opennebula.io/repo/repo.key
     keyring: /usr/share/keyrings/opennebula.gpg
     state: present
 
 - name: Add OpenNebula {{ one_version }} apt repository
-  apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/opennebula.gpg] https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }} stable opennebula
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/opennebula.gpg]
+      https://downloads.opennebula.io/repo/{{ one_version }}/{{ ansible_distribution }}/{{ ansible_distribution_version }}
+      stable opennebula
     filename: opennebula
     update_cache: yes
     state: present
 
 - name: Install opennebula-node-kvm
-  apt:
+  ansible.builtin.apt:
     name: opennebula-node-kvm={{ one_install_version }}*
     install_recommends: no
     state: present

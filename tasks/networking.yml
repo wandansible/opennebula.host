@@ -1,18 +1,18 @@
 ---
 - name: Get default libvirt network info
-  command:
+  ansible.builtin.command:
     cmd: virsh net-info default
   register: result
   ignore_errors: true
   changed_when: false
 
 - name: Stop default libvirt network
-  command:
+  ansible.builtin.command:
     cmd: virsh net-destroy default
   when: 'result.stdout is search("Active:\s+yes")'
 
 - name: Disable autostart for default libvirt network
-  command:
+  ansible.builtin.command:
     cmd: virsh net-autostart --network default --disable
   when: 'result.stdout is search("Autostart:\s+yes")'
 
@@ -38,18 +38,21 @@
 
 - name: Add wand Open vSwitch apt repository
   ansible.builtin.apt_repository:
-    repo: deb [signed-by=/usr/share/keyrings/wand-openvswitch.gpg] https://dl.cloudsmith.io/public/wand/openvswitch/deb/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} main
+    repo: >-
+      deb [signed-by=/usr/share/keyrings/wand-openvswitch.gpg]
+      https://dl.cloudsmith.io/public/wand/openvswitch/deb/{{ ansible_distribution | lower }}
+      {{ ansible_distribution_release }} main
     filename: wand-openvswitch
     update_cache: yes
     state: present
 
 - name: Install openvswitch-switch
-  apt:
+  ansible.builtin.apt:
     name: openvswitch-switch
     state: present
 
 - name: Create virtual bridges
-  openvswitch_bridge:
+  openvswitch.openvswitch.openvswitch_bridge:
     bridge: "{{ item.bridge }}"
     state: present
   loop: "{{ one_host.network_interfaces }}"
@@ -57,7 +60,7 @@
     label: "{{ item.bridge }}"
 
 - name: Add external ports to virtual bridges
-  openvswitch_port:
+  openvswitch.openvswitch.openvswitch_port:
     bridge: "{{ item.bridge }}"
     port: "{{ item.extport }}"
     state: present

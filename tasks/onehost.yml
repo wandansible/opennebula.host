@@ -28,7 +28,7 @@
   no_log: true
 
 - name: Add host to OpenNebula
-  one_host:
+  community.general.one_host:
     api_url: "{{ one_api_url }}"
     api_username: "{{ one_api_username }}"
     api_password: "{{ one_api_password }}"

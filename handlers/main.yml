@@ -1,23 +1,23 @@
 ---
 - name: restart libvirtd
-  service:
+  ansible.builtin.service:
     name: libvirtd
     state: restarted
 
 - name: systemd daemon-reload
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
 
 - name: restart one-net
-  service:
+  ansible.builtin.service:
     name: one-net
     state: restarted
 
 - name: netplan apply
-  command:
+  ansible.builtin.command:
     cmd: netplan apply
 
 - name: restart networking
-  service:
+  ansible.builtin.service:
     name: networking.service
     state: restarted

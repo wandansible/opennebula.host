@@ -1,6 +1,6 @@
 ---
 - name: Mount disk to OpenNebula datastores root
-  mount:
+  ansible.posix.mount:
     path: /var/lib/one/datastores
     src: UUID={{ one_datastores_disk_uuid }}
     fstype: ext4
@@ -8,7 +8,7 @@
   when: one_datastores_disk_uuid is defined
 
 - name: Set ownership and permissions for OpenNebula datastores root
-  file:
+  ansible.builtin.file:
     path: /var/lib/one/datastores
     state: directory
     owner: oneadmin
@@ -16,7 +16,7 @@
     mode: '0750'
 
 - name: Mount disks to individual OpenNebula datastores
-  mount:
+  ansible.posix.mount:
     path: /var/lib/one/datastores/{{ item.id }}
     src: UUID={{ item.disk_uuid }}
     fstype: ext4
@@ -26,7 +26,7 @@
     label: "{{ item.id }}"
 
 - name: Set ownership and permissions for individual OpenNebula datastores
-  file:
+  ansible.builtin.file:
     path: /var/lib/one/datastores/{{ item.id }}
     state: directory
     owner: oneadmin

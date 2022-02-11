@@ -1,26 +1,26 @@
 ---
 - name: Create private network bridge ({{ one_host.private_net.internal.bridge }})
-  openvswitch_bridge:
+  openvswitch.openvswitch.openvswitch_bridge:
     bridge: "{{ one_host.private_net.internal.bridge }}"
     state: present
 
 - name: Install legacy ebtables
-  apt:
+  ansible.builtin.apt:
     name: ebtables
     state: present
 
 - name: Install bridge-utils
-  apt:
+  ansible.builtin.apt:
     name: bridge-utils
     state: present
 
 - name: Check for netplan
-  stat:
+  ansible.builtin.stat:
     path: /usr/sbin/netplan
   register: check_for_netplan
 
 - name: Configure netplan
-  template:
+  ansible.builtin.template:
     src: one-net/netplan.yaml
     dest: /etc/netplan/20-one-net.yaml
     owner: root
@@ -30,7 +30,7 @@
   when: "check_for_netplan.stat.exists"
 
 - name: Configure netplan ifup hook
-  template:
+  ansible.builtin.template:
     src: one-net/netplan-ifup-hook
     dest: /etc/networkd-dispatcher/routable.d/20-one-net-ifup-hook
     owner: root
@@ -40,7 +40,7 @@
   when: "check_for_netplan.stat.exists"
 
 - name: Configure ifupdown
-  template:
+  ansible.builtin.template:
     src: one-net/ifupdown
     dest: /etc/network/interfaces.d/one-net
     owner: root
@@ -48,4 +48,3 @@
     mode: '0644'
   notify: restart networking
   when: "not check_for_netplan.stat.exists"
-
