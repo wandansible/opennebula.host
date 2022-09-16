@@ -1,0 +1,213 @@
+---
+argument_specs:
+  main:
+    short_description: Deploy an OpenNebula host
+    description: Deploy an OpenNebula virtualisation host and add it to an existing cluster.
+    options:
+      one_apt_key_fingerprint:
+        description: Fingerprint for the OpenNebula apt key
+        type: str
+
+      one_install_version:
+        description: Version of OpenNebula to install
+        type: str
+        default: 6.4.0
+
+      one_version:
+        description: Version of the OpenNebula repository to track
+        type: str
+        default: 6.4
+
+      one_datastores_disk_uuid:
+        description: UUID of the disk to mount to the datastores root directory
+        type: str
+
+      one_datastore_mounts:
+        description: Disk mounts for individual datastores
+        type: list
+        elements: dict
+        options:
+          id:
+            description: ID of the datastore to mount to
+            type: int
+            required: true
+          disk_uuid:
+            description: UUID of the disk being mounted
+            type: str
+            required: true
+
+      one_ssh_pubkey:
+        description: Contents of the oneadmin ssh public key
+        type: str
+        required: true
+
+      one_frontend:
+        description: Hostname of the frontend server
+        type: str
+        required: true
+
+      one_frontend_key:
+        description: Contents of the frontend host key
+        type: str
+        required: true
+
+      one_lvm_datastores:
+        description: LVM datastores for the host
+        type: list
+        elements: dict
+        options:
+          tier:
+            description: Name of the storage tier
+            type: str
+            required: true
+          vg:
+            description: Name of the volume group
+            type: str
+            required: true
+          mkfs_ext_opts:
+            description: |
+              Options for ext filesystems created in the datastore,
+              example for RAID drives:
+              -b <block_size> -E stride=<chunk_size / block_size>,stripe-width=<stride * num_data_bearing_drives>
+            type: str
+          mkfs_xfs_opts:
+            description: |
+              Options for xfs filesystems created in the datastore,
+              example for RAID drives:
+              -b size=<block_size> -d su=<chunk_size>,sw=<num_data_bearing_drives>
+            type: str
+
+      one_host_datastores:
+        description: Names of datastores the host contains
+        type: list
+        elements: str
+        default:
+          - Default
+          - Images
+          - Files
+
+      one_default_vdc:
+        description: Name of the default virtual datacenter
+        type: str
+        default: default
+
+      one_api_url:
+        description: URL for the OpenNebula API (relative to the frontend server)
+        type: str
+        default: http://127.0.0.1:2633/RPC2
+
+      one_api_username:
+        description: Username for API authentication
+        type: str
+        default: ansible
+
+      one_api_password:
+        description: Password for API authentication
+        type: str
+        required: true
+
+      one_host_type:
+        description: The default host type
+        type: str
+        required: true
+
+      one_host:
+        description: Properties for the host
+        type: dict
+        required: true
+        options:
+          key:
+            description: Contents of the SSH host key
+            type: str
+            required: true
+          type:
+            description: The host type
+            type: str
+          cluster_id:
+            description: The cluster the host belongs to
+            type: int
+            required: true
+          network_interfaces:
+            description: The network interfaces connected to virtual bridges
+            type: list
+            elements: dict
+            required: true
+            options:
+              bridge:
+                description: Name of the virtual bridge to create
+                type: str
+                required: true
+              extport:
+                description: Name of the external interface
+                type: str
+                required: true
+          reserved_cpu:
+            description: |
+              Amount of CPU reserved given in number of logical CPUs
+              multiplied by 100 (1 logical CPU = 100),
+              use a negative number for oversubscription
+              which can be calculated by:
+              -100 * num_logical_cpus * (oversubscription_factor - 1)
+            type: int
+            default: 0
+          reserved_mem:
+            description: Amount of memory reserved in KB
+            type: int
+            default: 0
+          vms_pinned:
+            description: If true, the host will support CPU pinning
+            type: bool
+            default: false
+          vms_per_thread:
+            description: Number of VMs that can be assigned to one CPU thread when pinned
+            type: int
+            default: 1
+          private_net:
+            description: Configuration for the private virtual network used by normal users
+            type: dict
+            options:
+              internal:
+                description: Configuration for the internal network
+                type: dict
+                required: true
+                options:
+                  bridge:
+                    description: Name of the bridge
+                    type: str
+                    required: true
+                  network:
+                    description: IP subnet of the network
+                    type: str
+                    required: true
+                  ip:
+                    description: IP address of the bridge interface
+                    type: str
+                    required: true
+              external:
+                description: Configuration for the external network
+                type: dict
+                required: true
+                options:
+                  bridge:
+                    description: Name of the bridge
+                    type: str
+                    required: true
+                  network:
+                    description: IP subnet of the network
+                    type: str
+                    required: true
+                  ip:
+                    description: IP address of the bridge interface
+                    type: str
+                  gateway:
+                    description: Default gateway
+                    type: str
+                    required: true
+              bridge:
+                description: Name of the bridge connecting the internal and external networks
+                type: str
+                required: true
+
+      openvswitch_apt_key_fingerprint:
+        description: Fingerprint for the Open vSwitch apt key
+        type: str
