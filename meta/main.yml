@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  namespace: wandansible
+  role_name: opennebula.host
+  author: WAND Network Research Group
+  description: Deploy an OpenNebula host
+
+  license: Apache-2.0
+
+  min_ansible_version: "2.10"
+
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+
+  galaxy_tags: []
+
+dependencies: []
