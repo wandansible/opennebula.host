@@ -109,7 +109,10 @@ argument_specs:
       one_host_type:
         description: The default host type
         type: str
-        required: true
+        choices:
+          - production
+          - development
+        default: production
 
       one_host:
         description: Properties for the host
