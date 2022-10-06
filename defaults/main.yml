@@ -8,6 +8,7 @@ one_host_datastores:
   - Default
   - Images
   - Files
+one_host_type: production
 one_default_vdc: default
 
 one_api_url: http://127.0.0.1:2633/RPC2
